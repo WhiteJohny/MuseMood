@@ -24,7 +24,8 @@ def fix_unprocessed_dataset(path: str):
     with open(path, 'r') as f:
         text = f.read().replace(', ', ',')
 
-    with open('edited_' + path, 'w') as f:
+    path = path[path.index('/') + 1:]
+    with open('edited_data/edited_' + path, 'w') as f:
         f.write(text)
 
 
@@ -71,35 +72,44 @@ def create_preprocessing_dataset(data: pd.DataFrame, labels: pd.DataFrame) -> pd
     )
 
 
-sentiment_labels = pd.read_csv('class_labels_indices.csv')
+sentiment_labels = pd.read_csv('raw_data/class_labels_indices.csv')
 sentiment_labels = create_class_labels(sentiment_labels)
 
-fix_unprocessed_dataset('unbalanced_train_segments.csv')
-fix_unprocessed_dataset('balanced_train_segments.csv')
-fix_unprocessed_dataset('eval_segments.csv')
+fix_unprocessed_dataset('raw_data/unbalanced_train_segments.csv')
+fix_unprocessed_dataset('raw_data/balanced_train_segments.csv')
+fix_unprocessed_dataset('raw_data/eval_segments.csv')
 
-unprocessed_unbalanced_dataset = pd.read_csv('edited_unbalanced_train_segments.csv', on_bad_lines='skip')
-unprocessed_balanced_dataset = pd.read_csv('edited_balanced_train_segments.csv', on_bad_lines='skip')
-unprocessed_eval_dataset = pd.read_csv('edited_eval_segments.csv', on_bad_lines='skip')
+unprocessed_unbalanced_dataset = pd.read_csv(
+    'edited_data/edited_unbalanced_train_segments.csv',
+    on_bad_lines='skip'
+)
+unprocessed_balanced_dataset = pd.read_csv(
+    'edited_data/edited_balanced_train_segments.csv',
+    on_bad_lines='skip'
+)
+unprocessed_eval_dataset = pd.read_csv(
+    'edited_data/edited_eval_segments.csv',
+    on_bad_lines='skip'
+)
 
 preprocessing_unbalanced_dataset = create_preprocessing_dataset(unprocessed_unbalanced_dataset, sentiment_labels['mid'])
 preprocessing_balanced_dataset = create_preprocessing_dataset(unprocessed_balanced_dataset, sentiment_labels['mid'])
 preprocessing_eval_dataset = create_preprocessing_dataset(unprocessed_eval_dataset, sentiment_labels['mid'])
 
 preprocessing_unbalanced_dataset.to_csv(
-    'preprocessing_unbalanced_dataset.csv',
+    'preprocessing_data/preprocessing_unbalanced_dataset.csv',
     sep=',',
     index=False,
     encoding='utf-8'
 )
 preprocessing_balanced_dataset.to_csv(
-    'preprocessing_balanced_dataset.csv',
+    'preprocessing_data/preprocessing_balanced_dataset.csv',
     sep=',',
     index=False,
     encoding='utf-8'
 )
 preprocessing_eval_dataset.to_csv(
-    'preprocessing_eval_dataset.csv',
+    'preprocessing_data/preprocessing_eval_dataset.csv',
     sep=',',
     index=False,
     encoding='utf-8'
