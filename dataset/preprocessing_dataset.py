@@ -1,4 +1,6 @@
 import pandas as pd
+import os
+
 
 LINK_PATTERN = 'https://www.youtube.com/watch?v='
 SENTIMENTS = ['funny', 'happy', 'sad', 'scary', 'tender', 'trance']
@@ -20,12 +22,14 @@ def create_class_labels(data: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(labels, columns=['index', 'display_name', 'mid'])
 
 
-def fix_unprocessed_dataset(path: str):
+def fix_unprocessed_dataset(path: str, dir_name: str) -> None:
     with open(path, 'r') as f:
         text = f.read().replace(', ', ',')
 
-    path = path[path.index('/') + 1:]
-    with open('edited_data/edited_' + path, 'w') as f:
+    if not os.path.isdir(dir_name):
+        os.mkdir(dir_name)
+
+    with open(dir_name + '/edited_' + path[path.index('/') + 1:], 'w') as f:
         f.write(text)
 
 
@@ -75,9 +79,9 @@ def create_preprocessing_dataset(data: pd.DataFrame, labels: pd.DataFrame) -> pd
 sentiment_labels = pd.read_csv('raw_data/class_labels_indices.csv')
 sentiment_labels = create_class_labels(sentiment_labels)
 
-fix_unprocessed_dataset('raw_data/unbalanced_train_segments.csv')
-fix_unprocessed_dataset('raw_data/balanced_train_segments.csv')
-fix_unprocessed_dataset('raw_data/eval_segments.csv')
+fix_unprocessed_dataset('raw_data/unbalanced_train_segments.csv', 'edited_data')
+fix_unprocessed_dataset('raw_data/balanced_train_segments.csv', 'edited_data')
+fix_unprocessed_dataset('raw_data/eval_segments.csv', 'edited_data')
 
 unprocessed_unbalanced_dataset = pd.read_csv(
     'edited_data/edited_unbalanced_train_segments.csv',
@@ -96,20 +100,24 @@ preprocessing_unbalanced_dataset = create_preprocessing_dataset(unprocessed_unba
 preprocessing_balanced_dataset = create_preprocessing_dataset(unprocessed_balanced_dataset, sentiment_labels['mid'])
 preprocessing_eval_dataset = create_preprocessing_dataset(unprocessed_eval_dataset, sentiment_labels['mid'])
 
+dir_name = 'preprocessing_data'
+if not os.path.isdir(dir_name):
+    os.mkdir(dir_name)
+
 preprocessing_unbalanced_dataset.to_csv(
-    'preprocessing_data/preprocessing_unbalanced_dataset.csv',
+    dir_name + '/preprocessing_unbalanced_dataset.csv',
     sep=',',
     index=False,
     encoding='utf-8'
 )
 preprocessing_balanced_dataset.to_csv(
-    'preprocessing_data/preprocessing_balanced_dataset.csv',
+    dir_name + '/preprocessing_balanced_dataset.csv',
     sep=',',
     index=False,
     encoding='utf-8'
 )
 preprocessing_eval_dataset.to_csv(
-    'preprocessing_data/preprocessing_eval_dataset.csv',
+    dir_name + '/preprocessing_eval_dataset.csv',
     sep=',',
     index=False,
     encoding='utf-8'
