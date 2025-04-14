@@ -2,6 +2,7 @@ import yt_dlp
 import subprocess
 import os
 
+
 def download_audio_as_wav(url, output_dir=".", start_time=None, end_time=None):
     # Валидация параметров времени
     if start_time is not None and start_time < 0:
@@ -58,10 +59,11 @@ def download_audio_as_wav(url, output_dir=".", start_time=None, end_time=None):
         print(f'❌ Ошибка скачивания: {str(e)}')
         return None
 
+
 # Пример использования
-download_audio_as_wav(
-    "https://youtu.be/dQw4w9WgXcQ",
-    output_dir="downloads",
-    start_time=100,
-    end_time=120
-)
+# download_audio_as_wav(
+#     "https://youtu.be/dQw4w9WgXcQ",
+#     output_dir="downloads",
+#     start_time=100,
+#     end_time=120
+# )
