@@ -1,2 +1,6 @@
 /venv/
 .idea
+/dataset/data/audio/
+/dataset/data/edited/
+/dataset/data/preprocessed/
+/dataset/data/raw/
