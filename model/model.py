@@ -4,17 +4,18 @@ from torch import nn
 class NeuralNetwork(nn.Module):
     def __init__(self):
         super().__init__()
-        self.flatten = nn.Flatten()
         self.linear_relu_stack = nn.Sequential(
-            nn.Linear(28*28, 512),
-            nn.ReLU(),
-            nn.Linear(512, 512),
-            nn.ReLU(),
-            nn.Linear(512, 10)
+            nn.Linear(75, 1024),
+            nn.Sigmoid(),
+            nn.Linear(1024, 2048),
+            nn.Sigmoid(),
+            nn.Linear(2048, 512),
+            nn.Sigmoid(),
+            nn.Linear(512, 6),
+            nn.Sigmoid()
         )
 
     def forward(self, x):
-        x = self.flatten(x)
         logits = self.linear_relu_stack(x)
         return logits
 

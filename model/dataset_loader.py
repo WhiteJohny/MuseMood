@@ -1,4 +1,3 @@
-import torch
 from torch.utils.data import Dataset
 import pandas as pd
 import numpy as np
@@ -6,7 +5,7 @@ import numpy as np
 
 class MuseMoodDataset(Dataset):
     def __init__(self, filepath, transform=None, target_transform=None):
-        self.data = pd.read_csv(filepath).to_numpy(dtype=np.float32)
+        self.data = pd.read_csv(filepath)
         self.transform = transform
         self.target_transform = target_transform
 
@@ -14,10 +13,10 @@ class MuseMoodDataset(Dataset):
         return len(self.data)
 
     def __getitem__(self, idx):
-        # Column index at which target data starts
-        split_idx = 3
-        X = self.data[idx, :split_idx]
-        Y = self.data[idx, split_idx:]
+        # Convert list string representation ("[1, 2, 3]") to numpy array
+        X = np.fromstring(self.data.iloc[idx, 0][1:-1], dtype=np.float32, sep=', ')
+
+        Y = np.array(self.data.iloc[idx, 1:], dtype=np.float32)
         if self.transform:
             X = self.transform(X)
         if self.target_transform:
@@ -30,8 +29,8 @@ if __name__ == '__main__':
     from torch.utils.data import DataLoader
 
     # Load dataset
-    training_data = MuseMoodDataset("../dataset/processing_data/processing_unbalanced_dataset.csv")
-    test_data = MuseMoodDataset("../dataset/processing_data/processing_eval_dataset.csv")
+    training_data = MuseMoodDataset("../dataset/data/processed/unbalanced_train_segments.csv")
+    test_data = MuseMoodDataset("../dataset/data/processed/eval_segments.csv")
 
     # Init DataLoaders to iterate through dataset
     train_dataloader = DataLoader(training_data, batch_size=64, shuffle=True)
