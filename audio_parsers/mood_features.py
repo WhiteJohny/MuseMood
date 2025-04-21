@@ -115,6 +115,8 @@ def extract_mood_features(file_path: str, sr: int = 22050) -> list:
     for i, vec in enumerate(feature_vectors):
         if vec.ndim != 1:
             raise ValueError(f"Ошибка размерности: Признак #{i} имеет {vec.ndim} измерений. Форма: {vec.shape}")
+        if not np.isfinite(vec.item()):
+            raise ValueError(f"Признак #{i} ({vec.item()}) не является конечным числом.")
 
     # Объединение всех признаков в один вектор -----------------------------
     feature_vector = np.concatenate(feature_vectors)
