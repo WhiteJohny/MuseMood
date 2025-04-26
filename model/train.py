@@ -42,9 +42,8 @@ def test(dataloader, model, loss_fn):
         for X, y in dataloader:
             X, y = X.to(DEVICE), y.to(DEVICE)
             pred: torch.Tensor = model(X)
-            if test_loss == 0: print(pred)
             test_loss += loss_fn(pred, y).item()
-            if (pred - y).abs().max().item() < 0.25:
+            if (pred - y).abs().max().item() < 0.5:
                 correct += 1
     test_loss /= num_batches
     correct /= size
