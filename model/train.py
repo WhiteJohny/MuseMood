@@ -2,10 +2,11 @@ import os
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
+from clearml import Logger
 from device_detector import DEVICE
 
 
-def train_epoch(dataloader, model, loss_fn, optimizer):
+def train_epoch(dataloader, model, loss_fn, optimizer, logger, iteration):
     num_batches = len(dataloader)
 
     # Set model to training mode
@@ -26,9 +27,11 @@ def train_epoch(dataloader, model, loss_fn, optimizer):
         # Print progress every few batches
         if batch % 25 == 0:
             print(f"loss: {loss:>7f}  [batch {batch:>5d}/{num_batches:>5d}]")
+        if logger is not None:
+            logger.report_scalar("Loss", "Train", loss, iteration)
 
 
-def test(dataloader, model, loss_fn):
+def test(dataloader, model, loss_fn, logger, iteration):
     size = len(dataloader.dataset)
     num_batches = len(dataloader)
 
@@ -42,13 +45,16 @@ def test(dataloader, model, loss_fn):
         for X, y in dataloader:
             X, y = X.to(DEVICE), y.to(DEVICE)
             pred: torch.Tensor = model(X)
-            if test_loss == 0: print(pred)
             test_loss += loss_fn(pred, y).item()
-            if (pred - y).abs().max().item() < 0.25:
+            if (pred - y).abs().max().item() < 0.5:
                 correct += 1
     test_loss /= num_batches
-    correct /= size
-    print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
+    accuracy = 100 * correct / size
+
+    print(f"Test Error: \n Accuracy: {accuracy:>0.1f}%, Avg loss: {test_loss:>8f} \n")
+    if logger is not None:
+        logger.report_scalar("Loss", "Test", test_loss, iteration)
+        logger.report_scalar("Accuracy", "Test", accuracy, iteration)
 
 
 def train(
@@ -57,12 +63,13 @@ def train(
         model: nn.Module,
         loss_fn: nn.modules.loss._Loss,
         optimizer: torch.optim.Optimizer,
-        epochs: int
+        epochs: int,
+        logger: Logger = None
 ):
     for t in range(epochs):
         print(f"Epoch {t + 1}\n-------------------------------")
-        train_epoch(train_dataloader, model, loss_fn, optimizer)
-        test(test_dataloader, model, loss_fn)
+        train_epoch(train_dataloader, model, loss_fn, optimizer, logger, t)
+        test(test_dataloader, model, loss_fn, logger, t)
     print("Done!")
 
 

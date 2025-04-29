@@ -1,17 +1,24 @@
-import os
 import torch
+import clearml
 import numpy as np
 from device_detector import DEVICE
 from model import NeuralNetwork
 
 
-def load_model(filename: str) -> NeuralNetwork:
-    """Загружает модель из файла"""
-    if not os.path.exists(filename):
-        raise FileNotFoundError(f"Model parameters {filename} not found")
+def load_model(model_name: str) -> NeuralNetwork:
+    """Загружает модель из ClearML"""
+    model_query = clearml.Model.query_models(
+        model_name=model_name,
+        project_name="MuseMood",
+        only_published=True,
+        max_results=1
+    )
+    if len(model_query) == 0:
+        raise RuntimeError(f'No published models found with name \"{model_name}\"')
+    model_weights = model_query[0].get_local_copy(raise_on_error=True, extract_archive=True)
 
     model = NeuralNetwork().to(DEVICE)
-    model.load_state_dict(torch.load(filename, weights_only=True))
+    model.load_state_dict(torch.load(model_weights, weights_only=True))
     model.eval()
     return model
 
@@ -25,7 +32,7 @@ def evaluate_mood(model: NeuralNetwork, features: list[float]) -> np.array:
 
 
 if __name__ == '__main__':
-    filename = "model_parameters.pth"
+    model_name = input("Input model name: ")
 
     # Ожидаемый результат: [0, 0, 0, 0, 1, 0]
     # Признаки аудио
@@ -47,6 +54,6 @@ if __name__ == '__main__':
         4.299254745793281, 3.6344273953147574, 3.1361207790842704, 3.6935861777703525, 3.796862804489892
     ]
 
-    model = load_model(filename)
+    model = load_model(model_name)
     results = evaluate_mood(model, features)
     print(results)

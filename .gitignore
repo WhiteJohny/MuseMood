@@ -3,5 +3,4 @@
 /dataset/data/audio/
 /dataset/data/edited/
 /dataset/data/preprocessed/
-/dataset/data/raw/
-/model/model_parameters.pth
+/model/*.pth
