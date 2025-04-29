@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-from dataset.audio_converter.audio_converter import extract_mood_features
+from audio_converter import extract_mood_features
 
 
 def make_dataset(audio_dir: str, file_name: str, data: pd.DataFrame) -> bool:

@@ -145,30 +145,30 @@ preprocessed_balanced_dataset = pd.read_csv('preprocessing_data/preprocessing_ba
 preprocessed_eval_dataset = pd.read_csv('preprocessing_data/preprocessing_eval_dataset.csv')
 
 
-dir_name = 'unbalanced_audio'
-if os.path.isdir(dir_name):
-    shutil.rmtree(dir_name)
-download(download_audio_as_wav, preprocessed_unbalanced_dataset, dir_name)
-make_dataset(dir_name, 'unbalanced_dataset.csv', preprocessed_unbalanced_dataset)
-
-dir_name = 'balanced_audio'
-if os.path.isdir(dir_name):
-    shutil.rmtree(dir_name)
-download(download_audio_as_wav, preprocessed_balanced_dataset, dir_name)
-make_dataset(dir_name, 'balanced_dataset.csv', preprocessed_balanced_dataset)
-
-dir_name = 'eval_audio'
-if os.path.isdir(dir_name):
-    shutil.rmtree(dir_name)
-download(download_audio_as_wav, preprocessed_eval_dataset, 'eval_audio')
-make_dataset(dir_name, 'eval_dataset.csv', preprocessed_eval_dataset)
-
-# Вектор из строки в np.ndarray (пример)
-# df = pd.read_csv("data.csv")
-# features_vector = np.array(eval(df["features"][0]))
-
-shutil.rmtree('edited_data')
-shutil.rmtree('preprocessing_data')
-shutil.rmtree('unbalanced_audio')
-shutil.rmtree('balanced_audio')
-shutil.rmtree('eval_audio')
+# dir_name = 'unbalanced_audio'
+# if os.path.isdir(dir_name):
+#     shutil.rmtree(dir_name)
+# download(download_audio_as_wav, preprocessed_unbalanced_dataset, dir_name)
+# make_dataset(dir_name, 'unbalanced_dataset.csv', preprocessed_unbalanced_dataset)
+#
+# dir_name = 'balanced_audio'
+# if os.path.isdir(dir_name):
+#     shutil.rmtree(dir_name)
+# download(download_audio_as_wav, preprocessed_balanced_dataset, dir_name)
+# make_dataset(dir_name, 'balanced_dataset.csv', preprocessed_balanced_dataset)
+#
+# dir_name = 'eval_audio'
+# if os.path.isdir(dir_name):
+#     shutil.rmtree(dir_name)
+# download(download_audio_as_wav, preprocessed_eval_dataset, 'eval_audio')
+# make_dataset(dir_name, 'eval_dataset.csv', preprocessed_eval_dataset)
+#
+# # Вектор из строки в np.ndarray (пример)
+# # df = pd.read_csv("data.csv")
+# # features_vector = np.array(eval(df["features"][0]))
+#
+# shutil.rmtree('edited_data')
+# shutil.rmtree('preprocessing_data')
+# shutil.rmtree('unbalanced_audio')
+# shutil.rmtree('balanced_audio')
+# shutil.rmtree('eval_audio')
