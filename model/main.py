@@ -50,7 +50,8 @@ def run_train_task(task: Task):
         model=model,
         loss_fn=torch.nn.MSELoss(),
         optimizer=torch.optim.SGD(model.parameters(), lr=learning_rate),
-        epochs=epochs
+        epochs=epochs,
+        logger=task.logger
     )
 
     # Save and upload to ClearML
