@@ -2,6 +2,9 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from random import choice
 
+from src.database.models import async_session_local
+from src.database.crud import *
+
 from src.bot.logic.settings import logger, set_log
 from src.bot.logic.keyboards import get_main_menu_kb, get_analysis_kb, get_profile_kb, get_playlists_kb, \
     get_create_playlist_kb
@@ -9,9 +12,11 @@ from src.bot.logic.fsm import User, STATES, KEYBOARDS, VIEWS
 from src.bot.logic.utils.audio_converters import get_audio_sentiments
 from src.bot.logic.utils.audio_parsers import download_yt_audio, download_tg_audio
 from src.bot.logic.views import get_start_msg, get_help_msg, get_model_msg, get_model_error, get_analysis_msg, \
-    get_garbage_msg, get_profile_msg, get_playlists_msg, get_playlist_creation_msg, get_playlist_creation_title_msg
+    get_garbage_msg, get_profile_msg, get_playlists_msg, get_playlist_creation_msg, get_playlist_creation_title_msg, \
+    get_error_message
 
 SENTIMENTS = ['funny', 'happy', 'sad', 'scary', 'tender', 'trance', None]
+SENTIMENTS_d = {'funny': 1, 'happy': 2, 'sad': 3, 'scary': 4, 'tender': 5, 'trance': 6}
 
 
 async def garbage_handler(message: Message, state: FSMContext):
@@ -23,8 +28,20 @@ async def garbage_handler(message: Message, state: FSMContext):
 
 async def start_command_handler(message: Message, state: FSMContext):
     logger.info(set_log('Start command', message.message_id, message.from_user.username))
-    await state.set_state(User.menu)
-    return await message.answer(get_start_msg(message.from_user.full_name), reply_markup=get_main_menu_kb())
+
+    try:
+        async with async_session_local() as session:
+            user = await get_user(session, message.from_user.id)
+            if not user:
+                await create_user(session, message.from_user.id, message.from_user.username)
+                await create_playlist(session, 'All', message.from_user.id)
+
+        await state.set_state(User.menu)
+
+        return await message.answer(get_start_msg(message.from_user.full_name), reply_markup=get_main_menu_kb())
+    except Exception as e:
+        logger.info(set_log('Start command handler', special=f"ERROR {e}"))
+        return await message.answer(get_error_message())
 
 
 async def help_command_handler(message: Message):
@@ -46,10 +63,21 @@ async def audio_analysis_link_handler(message: Message):
             audio_sentiments = get_audio_sentiments(audio_path, duration=duration)
             if audio_sentiments:
                 model_res = choice(SENTIMENTS)  # Для имитации работы модели -> get_sentiments(audio_sentiments)
-
                 if model_res:
-                    return await message.reply(get_model_msg(audio_path), reply_markup=get_analysis_kb())
-
+                    try:
+                        async with async_session_local() as session:
+                            audio = await create_audio(
+                                session,
+                                audio_path[13:],
+                                message.message_id,
+                                SENTIMENTS_d.get(model_res),
+                                link=message.text
+                            )
+                            playlist_id = await get_user_playlist(session, message.from_user.id)
+                            await add_audio_to_playlist(session, playlist_id, audio.id)
+                        return await message.reply(get_model_msg(model_res), reply_markup=get_analysis_kb())
+                    except Exception as e:
+                        logger.info(set_log('Track analysis process link', special=f"ERROR {e}"))
     return await message.answer(get_model_error(), reply_markup=get_analysis_kb())
 
 
@@ -60,10 +88,21 @@ async def audio_analysis_file_handler(message: Message):
         audio_sentiments = get_audio_sentiments(audio_path, duration=message.audio.duration)
         if audio_sentiments:
             model_res = choice(SENTIMENTS)  # Для имитации работы модели -> get_sentiments(audio_sentiments)
-
             if model_res:
-                return await message.reply(get_model_msg(audio_path), reply_markup=get_analysis_kb())
-
+                try:
+                    async with async_session_local() as session:
+                        audio = await create_audio(
+                            session,
+                            audio_path[13:],
+                            message.message_id,
+                            SENTIMENTS_d.get(model_res),
+                            file_id=message.audio.file_id
+                        )
+                        playlist_id = await get_user_playlist(session, message.from_user.id)
+                        await add_audio_to_playlist(session, playlist_id, audio.id)
+                    return await message.reply(get_model_msg(model_res), reply_markup=get_analysis_kb())
+                except Exception as e:
+                    logger.info(set_log('Track analysis process file', special=f"ERROR {e}"))
     return await message.answer(get_model_error(), reply_markup=get_analysis_kb())
 
 
@@ -84,10 +123,9 @@ async def profile_handler(message: Message, state: FSMContext):
 
 async def playlists_handler(message: Message):
     logger.info(set_log('Playlists handler', message.message_id, message.from_user.username))
-    # Должен быть запрос к БД для получения плейлистов пользователя
-    # playlists = get_user_playlist(message.from_user.id)
-    return await message.answer(get_playlists_msg(), reply_markup=get_playlists_kb(['1', '2', '3']))
-    # get_playlists_kb(playlists)
+    async with async_session_local() as session:
+        playlists = await get_user_playlists(session, message.from_user.id)
+    return await message.answer(get_playlists_msg(), reply_markup=get_playlists_kb(playlists))
 
 
 async def playlist_creation_handler(message: Message, state: FSMContext):
@@ -98,10 +136,11 @@ async def playlist_creation_handler(message: Message, state: FSMContext):
 
 async def playlist_creation_title_handler(message: Message, state: FSMContext):
     logger.info(set_log('Playlist creation title handler', message.message_id, message.from_user.username))
-    # тут функция добавления плейлиста в БД
-    error_flag = False
-    if error_flag:
-        return await message.answer(get_playlist_creation_title_msg(error_flag), reply_markup=get_create_playlist_kb())
+    async with async_session_local() as session:
+        playlist = await create_playlist(session, message.text, message.from_user.id)
+
+    if not playlist:
+        return await message.answer(get_playlist_creation_title_msg(True), reply_markup=get_create_playlist_kb())
 
     await state.set_state(User.profile)
-    return await message.answer(get_playlist_creation_title_msg(error_flag), reply_markup=get_profile_kb())
+    return await message.answer(get_playlist_creation_title_msg(False), reply_markup=get_profile_kb())

@@ -15,7 +15,11 @@ def get_profile_msg():
 
 
 def get_playlists_msg():
-    return 'ваши плейлисты'
+    return 'Ваши плейлисты'
+
+
+def get_playlists_error_msg():
+    return 'Не удалось перейти на страницу :('
 
 
 def get_bot_start_msg():
@@ -43,7 +47,7 @@ def get_garbage_msg():
 
 
 def get_audio_list_msg(playlist: str):
-    return f'Треки {playlist}:'
+    return f'{playlist}'
 
 
 def get_playlist_creation_msg():
@@ -55,3 +59,6 @@ def get_playlist_creation_title_msg(error_flag: bool):
         return 'Возникла непредвиденная ошибка, попробуйте позже :('
     return 'Плейлист создан'
 
+
+def get_error_message():
+    return "Что-то пошло не так :("

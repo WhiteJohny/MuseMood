@@ -4,11 +4,14 @@ import os
 from src.bot.logic.settings import bot, logger, set_log
 from src.bot.logic.utils.audio_converters import convert_to_wav
 
-OUTPUT_DIR = "../../../downloads"
+OUTPUT_DIR = "../downloads"
 MAX_SIZE = 10 * 1024 * 1024  # 10 МБ
 
 
 async def download_tg_audio(message: 'Message', bot: 'Bot' = bot, output_dir: str = OUTPUT_DIR):
+    if not os.path.isdir(output_dir):
+        os.mkdir(output_dir)
+
     try:
         if message.audio.file_size > MAX_SIZE:
             return await message.answer("Файл слишком большой!")
@@ -47,7 +50,8 @@ async def download_yt_audio(url: str, output_dir: str = OUTPUT_DIR):
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             duration = info.get('duration') or 0
-            if info.get('formats')[9] > MAX_SIZE:
+            print(info.get('formats')[9].get('filesize'))
+            if info.get('formats')[9].get('filesize') > MAX_SIZE:
                 raise ValueError('Audiofile size too big')
 
             info = ydl.extract_info(url, download=True)
