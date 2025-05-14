@@ -12,7 +12,7 @@ from src.bot.logic.fsm import User
 
 from src.bot.logic.handlers.simple import start_command_handler, help_command_handler, audio_analysis_handler, \
     audio_analysis_link_handler, audio_analysis_file_handler, garbage_handler, back_handler, profile_handler, \
-    playlists_handler, playlist_creation_handler, playlist_creation_title_handler
+    playlists_handler, playlist_creation_handler, playlist_creation_title_handler, cancel_playlist_creation_handler
 
 from src.bot.logic.handlers.events import bot_start, bot_stop, stop_command_handler, audio_list_handler, \
     audio_handler, playlists_page_handler, audio_add_handler, audio_page_handler, exit_to_menu_handler, \
@@ -39,6 +39,7 @@ async def start(async_engine):
     dp.callback_query.register(exit_to_menu_handler, F.data == "exit_to_menu")
     dp.callback_query.register(audio_delete_handler, F.data.startswith("delete_audio_"))
 
+    dp.message.register(cancel_playlist_creation_handler, F.text == 'Отмена')
     dp.message.register(back_handler, F.text == 'Назад')
     dp.message.register(audio_analysis_handler, F.text == 'Анализ', StateFilter(User.menu))
     dp.message.register(profile_handler, F.text == 'Профиль', StateFilter(User.menu))

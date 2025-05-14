@@ -165,3 +165,9 @@ async def playlist_creation_title_handler(message: Message, state: FSMContext):
 
     await state.set_state(User.profile)
     return await message.answer(get_playlist_creation_title_msg(False), reply_markup=get_profile_kb())
+
+
+async def cancel_playlist_creation_handler(message: Message, state: FSMContext):
+    logger.info(set_log('cancel playlist creation handler', message.message_id, message.from_user.username))
+    await state.set_state(User.profile)
+    return await message.answer(get_profile_msg(), reply_markup=get_profile_kb())
