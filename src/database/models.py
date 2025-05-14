@@ -44,7 +44,7 @@ class Audio(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False)
-    sentiment = Column(Integer, nullable=False)
+    sentiments = Column(String, nullable=False)
     message_id = Column(Integer, nullable=False)
     file_id = Column(String)
     link = Column(String)

@@ -7,14 +7,12 @@ from sqlalchemy.exc import IntegrityError
 from src.bot.logic.keyboards import get_playlist_audio_kb, get_playlists_kb, get_add_to_playlist_kb, get_audio_kb
 from src.bot.logic.utils import commands
 from src.bot.logic.views import get_bot_start_msg, get_bot_stop_msg, get_audio_list_msg, get_playlists_msg, \
-    get_playlists_error_msg, get_error_message
+    get_playlists_error_msg, get_error_message, get_model_msg
 from src.bot.logic.settings import Secrets, logger, set_log
 from src.bot.logic.settings import bot
 from src.database.crud import get_user_playlists, get_audios_in_playlist, get_playlist_title, add_audio_to_playlist, \
     get_user_playlist, get_audio, remove_audio_from_playlist, remove_audio
 from src.database.models import async_session_local
-
-SENTIMENTS_d = {1: 'funny', 2: 'happy', 3: 'sad', 4: 'scary', 5: 'tender', 6: 'trance'}
 
 
 async def bot_start():
@@ -94,7 +92,7 @@ async def audio_handler(callback: CallbackQuery):
 
         try:
             await callback.message.answer(
-                f'{audio.title} - {SENTIMENTS_d[audio.sentiment]}',
+                get_model_msg(audio),
                 reply_to_message_id=audio.message_id,
                 reply_markup=get_audio_kb(audio_id, playlist_id, page)
             )

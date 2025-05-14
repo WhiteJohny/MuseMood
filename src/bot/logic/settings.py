@@ -45,6 +45,8 @@ class Secrets:
     bot_token: str = os.getenv("BOT_TOKEN")
     admins_id: str = os.getenv("ADMINS_ID")
 
+    model_name: str = os.getenv("MODEL_NAME")
+
     db_user: str = os.getenv("DB_USER")
     db_password: str = os.getenv("DB_PASSWORD")
     db_name: str = os.getenv("DB_NAME")

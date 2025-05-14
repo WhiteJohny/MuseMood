@@ -6,6 +6,7 @@ from aiogram.filters import Command, StateFilter
 from aiogram.methods import DeleteWebhook
 
 from src.database.models import engine, Base
+
 from src.bot.logic.settings import bot
 from src.bot.logic.fsm import User
 

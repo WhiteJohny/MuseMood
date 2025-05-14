@@ -1,3 +1,5 @@
+import asyncio
+
 import yt_dlp
 import os
 
@@ -21,7 +23,11 @@ async def download_tg_audio(message: 'Message', bot: 'Bot' = bot, output_dir: st
         audio_path = audio.file_path
         download_path = os.path.join(output_dir, f'{message.audio.file_name}.wav')
         await bot.download_file(audio_path, os.path.join(output_dir, message.audio.file_name))
-        convert_to_wav(os.path.join(output_dir, message.audio.file_name), download_path)
+        await asyncio.to_thread(
+            convert_to_wav,
+            os.path.join(output_dir, message.audio.file_name),
+            download_path
+        )
 
         if not os.path.isfile(download_path):
             raise FileNotFoundError(f"Audio not found: {download_path}")
@@ -32,7 +38,7 @@ async def download_tg_audio(message: 'Message', bot: 'Bot' = bot, output_dir: st
         return None
 
 
-async def download_yt_audio(url: str, output_dir: str = OUTPUT_DIR):
+def download_yt_audio(url: str, output_dir: str = OUTPUT_DIR):
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
 

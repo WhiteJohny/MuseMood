@@ -19,7 +19,7 @@ def convert_to_wav(input_file, output_file):
     subprocess.run(command, check=True)
 
 
-def get_audio_sentiments(file_path: str, sr: int = 22050, duration: float = 10.0) -> list | None:
+def get_audio_sentiments(file_path: str, duration: float = 10.0, sr: int = 22050,) -> list | None:
     """
     Извлекает признаки для классификации музыкального настроения из аудиофайла.
 

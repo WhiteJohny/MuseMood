@@ -117,11 +117,11 @@ async def remove_audio_from_playlist(session: AsyncSession, playlist_id: int, au
 async def create_audio(
         session: AsyncSession,
         title: str, message_id: int,
-        sentiment: int = None,
+        sentiments: int = None,
         file_id: str = None,
         link: str = None
 ) -> Audio:
-    audio = Audio(title=title, message_id=message_id, sentiment=sentiment, file_id=file_id, link=link)
+    audio = Audio(title=title, message_id=message_id, sentiments=sentiments, file_id=file_id, link=link)
     session.add(audio)
     await session.commit()
     await session.refresh(audio)

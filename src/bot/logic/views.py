@@ -1,3 +1,6 @@
+SENTIMENTS = ['funny', 'happy', 'sad', 'scary', 'tender', 'trance']
+
+
 def get_start_msg(name):
     return f"Приветствую👋, {name}!\nЧтобы узнать, что я умею - напиши\n/help"
 
@@ -30,8 +33,9 @@ def get_bot_stop_msg():
     return "Бот завершил работу"
 
 
-def get_model_msg(model_res):
-    return model_res
+def get_model_msg(audio):
+    sentiments = audio.sentiments.split(" ")
+    return f'{audio.title} - {", ".join([SENTIMENTS[i] for i in range(0, len(SENTIMENTS)) if sentiments[i] == "1"])}'
 
 
 def get_model_error():
