@@ -113,6 +113,17 @@ async def remove_audio_from_playlist(session: AsyncSession, playlist_id: int, au
         return False
 
 
+async def delete_playlist(session: AsyncSession, playlist_id: int):
+    playlist = await session.get(Playlist, playlist_id)
+
+    if not playlist:
+        return False
+
+    await session.delete(playlist)
+    await session.commit()
+    return True
+
+
 # Audios
 async def create_audio(
         session: AsyncSession,

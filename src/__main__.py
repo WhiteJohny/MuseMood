@@ -16,7 +16,7 @@ from src.bot.logic.handlers.simple import start_command_handler, help_command_ha
 
 from src.bot.logic.handlers.events import bot_start, bot_stop, stop_command_handler, audio_list_handler, \
     audio_handler, playlists_page_handler, audio_add_handler, audio_page_handler, exit_to_menu_handler, \
-    audio_delete_handler
+    audio_delete_handler, playlist_delete_approve_handler, playlist_delete_handler
 
 
 async def start(async_engine):
@@ -38,6 +38,8 @@ async def start(async_engine):
     dp.callback_query.register(audio_add_handler, F.data.startswith("add_audio_"))
     dp.callback_query.register(exit_to_menu_handler, F.data == "exit_to_menu")
     dp.callback_query.register(audio_delete_handler, F.data.startswith("delete_audio_"))
+    dp.callback_query.register(playlist_delete_approve_handler, F.data.startswith("delete_approve_playlist_"))
+    dp.callback_query.register(playlist_delete_handler, F.data.startswith("delete_playlist_"))
 
     dp.message.register(cancel_playlist_creation_handler, F.text == 'Отмена')
     dp.message.register(back_handler, F.text == 'Назад')

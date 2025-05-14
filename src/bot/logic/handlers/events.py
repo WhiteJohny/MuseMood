@@ -4,14 +4,15 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import Message, CallbackQuery
 from sqlalchemy.exc import IntegrityError
 
-from src.bot.logic.keyboards import get_playlist_audio_kb, get_playlists_kb, get_add_to_playlist_kb, get_audio_kb
+from src.bot.logic.keyboards import get_playlist_audio_kb, get_playlists_kb, get_add_to_playlist_kb, get_audio_kb, \
+    get_approve_kb, get_profile_kb
 from src.bot.logic.utils import commands
 from src.bot.logic.views import get_bot_start_msg, get_bot_stop_msg, get_audio_list_msg, get_playlists_msg, \
     get_playlists_error_msg, get_error_message, get_model_msg
 from src.bot.logic.settings import Secrets, logger, set_log
 from src.bot.logic.settings import bot
 from src.database.crud import get_user_playlists, get_audios_in_playlist, get_playlist_title, add_audio_to_playlist, \
-    get_user_playlist, get_audio, remove_audio_from_playlist, remove_audio
+    get_user_playlist, get_audio, remove_audio_from_playlist, remove_audio, delete_playlist
 from src.database.models import async_session_local
 
 
@@ -70,9 +71,13 @@ async def audio_list_handler(callback: CallbackQuery):
 
         await callback.message.delete()
 
+        flag = True
+        if playlist_title == 'All':
+            flag = False
+
         return await callback.message.answer(
             get_audio_list_msg(playlist_title),
-            reply_markup=get_playlist_audio_kb(audio_list, playlist_id, page_id)
+            reply_markup=get_playlist_audio_kb(audio_list, playlist_id, page_id, flag=flag)
         )
     except Exception as e:
         logger.info(set_log('Audio list handler', special=f"ERROR {e}"))
@@ -161,9 +166,11 @@ async def audio_delete_handler(callback: CallbackQuery):
     page = int(data[6])
 
     try:
+        flag = True
         async with async_session_local() as session:
             playlist_title = await get_playlist_title(session, playlist_id)
             if playlist_title == 'All':
+                flag = False
                 await remove_audio(session, audio_id)
             else:
                 await remove_audio_from_playlist(session, playlist_id, audio_id)
@@ -176,5 +183,42 @@ async def audio_delete_handler(callback: CallbackQuery):
 
     return callback.message.answer(
         'Трек успешно удален!',
-        reply_markup=get_playlist_audio_kb(audio_list, playlist_id, page)
+        reply_markup=get_playlist_audio_kb(audio_list, playlist_id, page, flag)
     )
+
+
+async def playlist_delete_approve_handler(callback: CallbackQuery):
+    logger.info(set_log('Playlist delete approve handler', callback.message.message_id, callback.from_user.username))
+    data = callback.data.split("_")
+    playlist_id = int(data[3])
+    page = int(data[5])
+
+    try:
+        async with async_session_local() as session:
+            playlist_title = await get_playlist_title(session, playlist_id)
+    except Exception as e:
+        logger.info(set_log('Playlist delete approve handler', special=f"ERROR {e}"))
+        return callback.message.answer(get_error_message())
+
+    await callback.message.delete()
+
+    return await callback.message.answer(
+        f'Вы уверены, что хотите удалить {playlist_title}?',
+        reply_markup=get_approve_kb(playlist_id, page)
+    )
+
+
+async def playlist_delete_handler(callback: CallbackQuery):
+    logger.info(set_log('Playlist delete handler', callback.message.message_id, callback.from_user.username))
+    playlist_id = int(callback.data.split("_")[2])
+
+    try:
+        async with async_session_local() as session:
+            await delete_playlist(session, playlist_id)
+    except Exception as e:
+        logger.info(set_log('Playlist delete handler', special=f"ERROR {e}"))
+        return callback.message.answer(get_error_message())
+
+    await callback.message.delete()
+
+    return await callback.message.answer("Плейлист удален!", reply_markup=get_profile_kb())
