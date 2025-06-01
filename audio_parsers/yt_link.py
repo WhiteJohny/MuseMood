@@ -6,7 +6,7 @@ LINK_PATTERN = 'https://www.youtube.com/watch?v='
 
 def download_audio_as_wav(
         video_id: str,
-        output_dir: str = "."
+        output_dir: str = ".",
 ):
     filename = os.path.join(output_dir, f'{video_id}.wav')
     if os.path.exists(filename):
@@ -22,7 +22,7 @@ def download_audio_as_wav(
         'outtmpl': os.path.join(output_dir, f'{video_id}.%(ext)s'),
         'verbose': False,
         'socket_timeout': 5,
-        'ffmpeg_location': 'C:\\Program Files\\FFmpeg\\bin'
+        # 'ffmpeg_location': 'C:\\Program Files\\FFmpeg\\bin'
     }
 
     try:
