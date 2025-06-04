@@ -42,14 +42,14 @@ load_dotenv()
 
 @dataclass
 class Secrets:
-    bot_token: str = os.getenv("BOT_TOKEN")
-    admins_id: str = os.getenv("ADMINS_ID")
+    bot_token: str = os.getenv("BOT_TOKEN") or ""
+    admins_id: str = os.getenv("ADMINS_ID") or ""
 
-    model_name: str = os.getenv("MODEL_NAME")
+    model_name: str = os.getenv("MODEL_NAME") or ""
 
-    db_user: str = os.getenv("DB_USER")
-    db_password: str = os.getenv("DB_PASSWORD")
-    db_name: str = os.getenv("DB_NAME")
+    db_user: str = os.getenv("DB_USER") or ""
+    db_password: str = os.getenv("DB_PASSWORD") or ""
+    db_name: str = os.getenv("DB_NAME") or ""
 
 
 bot = Bot(token=Secrets.bot_token, default=DefaultBotProperties(parse_mode='HTML'))
