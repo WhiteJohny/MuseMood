@@ -37,5 +37,19 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
+      env:
+        BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        ADMINS_ID: ${{ secrets.ADMINS_ID }}
+        DB_USER: ${{ secrets.DB_USER }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        DB_HOST: localhost
+        DB_PORT: 5432
+        DB_NAME: ${{ secrets.DB_NAME }}
+        MODEL_NAME: ${{ secrets.MODEL_NAME }}
+        CLEARML_WEB_HOST: ${{ secrets.CLEARML_WEB_HOST }}
+        CLEARML_API_HOST: ${{ secrets.CLEARML_API_HOST }}
+        CLEARML_FILES_HOST: ${{ secrets.CLEARML_FILES_HOST }}
+        CLEARML_API_ACCESS_KEY: ${{ secrets.CLEARML_API_ACCESS_KEY }}
+        CLEARML_API_SECRET_KEY: ${{ secrets.CLEARML_API_SECRET_KEY }}
       run: |
         pytest
