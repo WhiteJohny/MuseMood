@@ -56,8 +56,8 @@ def download_yt_audio(url: str, output_dir: str = OUTPUT_DIR):
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             duration = info.get('duration') or 0
-            print(info.get('formats')[9].get('filesize'))
-            if info.get('formats')[9].get('filesize') > MAX_SIZE:
+            file_size = info.get('filesize') or MAX_SIZE + 1
+            if file_size > MAX_SIZE:
                 raise ValueError('Audiofile size too big')
 
             info = ydl.extract_info(url, download=True)
