@@ -42,7 +42,7 @@ load_dotenv()
 
 @dataclass
 class Secrets:
-    bot_token: str = os.getenv("BOT_TOKEN") or ""
+    bot_token: str = os.getenv("BOT_TOKEN") or "6927464519:AAEs6DweSplLaJc53cjReX8s1HdfFGq7mLI"  # Токен от другого бота
     admins_id: str = os.getenv("ADMINS_ID") or ""
 
     model_name: str = os.getenv("MODEL_NAME") or ""
