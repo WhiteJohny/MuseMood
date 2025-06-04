@@ -63,8 +63,10 @@ def make_dataset(filename: str, audio_dir: str, output_dir: str, workers: int = 
         res = return_queue.get()
         if res is None:
             count_workers_done += 1
-            if count_workers_done == workers: break
-            else: continue
+            if count_workers_done == workers:
+                break
+            else:
+                continue
 
         i, res = res
 
@@ -73,7 +75,8 @@ def make_dataset(filename: str, audio_dir: str, output_dir: str, workers: int = 
     # Combine features with mood results
     print('Объединение признаков с эмоциональными оценками...')
     for i in range(len(data)):
-        if i not in features: continue
+        if i not in features:
+            continue
 
         frame = data.iloc[i]
 

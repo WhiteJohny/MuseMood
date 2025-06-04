@@ -5,7 +5,8 @@ from aiogram.types import Message
 
 from src.model.evaluate import load_model, evaluate_mood
 from src.database.models import async_session_local
-from src.database.crud import *
+from src.database.crud import get_user, create_user, create_playlist, create_audio, get_user_playlist, \
+    add_audio_to_playlist, get_user_playlists
 
 from src.bot.logic.settings import logger, set_log, Secrets
 from src.bot.logic.keyboards import get_main_menu_kb, get_analysis_kb, get_profile_kb, get_playlists_kb, \

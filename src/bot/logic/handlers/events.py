@@ -126,7 +126,7 @@ async def audio_page_handler(callback: CallbackQuery):
         await callback.message.delete()
 
         return await callback.message.answer(
-            f'Ваши аудио',
+            'Ваши аудио',
             reply_markup=get_add_to_playlist_kb(audio_list, playlist_id, page_id)
         )
     except Exception as e:

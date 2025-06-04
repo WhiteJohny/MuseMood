@@ -10,7 +10,7 @@ OUTPUT_DIR = "../downloads"
 MAX_SIZE = 10 * 1024 * 1024  # 10 МБ
 
 
-async def download_tg_audio(message: 'Message', bot: 'Bot' = bot, output_dir: str = OUTPUT_DIR):
+async def download_tg_audio(message, bot=bot, output_dir: str = OUTPUT_DIR):
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
 

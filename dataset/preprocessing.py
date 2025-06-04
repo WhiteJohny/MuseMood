@@ -100,8 +100,10 @@ def preprocess_dataset(filename: str, labels: pd.DataFrame):
 
 
 def main():
-    if not os.path.exists(DIR_EDITED): os.mkdir(DIR_EDITED)
-    if not os.path.exists(DIR_PREPROCESSED): os.mkdir(DIR_PREPROCESSED)
+    if not os.path.exists(DIR_EDITED):
+        os.mkdir(DIR_EDITED)
+    if not os.path.exists(DIR_PREPROCESSED):
+        os.mkdir(DIR_PREPROCESSED)
 
     sentiment_labels = load_class_labels()
     preprocess_dataset('eval_segments.csv', sentiment_labels)

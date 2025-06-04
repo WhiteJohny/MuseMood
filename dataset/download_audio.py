@@ -90,12 +90,12 @@ def download_audio(
     for _ in range(download_workers):
         download_queue.put(None)
     download_queue.join()
-    print(f'Audio downloading done!')
+    print('Audio downloading done!')
 
     for _ in range(crop_workers):
         crop_queue.put(None)
     crop_queue.join()
-    print(f'Audio cropping done!')
+    print('Audio cropping done!')
 
 
 def main():

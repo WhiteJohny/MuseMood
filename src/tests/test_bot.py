@@ -1,15 +1,11 @@
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-from aiogram.types import Message, CallbackQuery, User as TgUser, Audio, BotCommand
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from aiogram.exceptions import TelegramBadRequest
-from sqlalchemy.exc import IntegrityError
 
 # Исправленные импорты согласно структуре проекта
 from src.bot.logic import views, keyboards, fsm
 from src.bot.logic.utils import commands
-from src.bot.logic.handlers import events, simple
+from src.bot.logic.handlers import simple
 from src.database import crud, models
 
 
