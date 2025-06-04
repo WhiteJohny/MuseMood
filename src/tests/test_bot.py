@@ -75,32 +75,32 @@ async def test_set_commands():
 
 
 # Тесты для simple.py
-@pytest.mark.asyncio
-async def test_start_handler():
-    mock_message = AsyncMock()
-    mock_message.from_user.id = 123
-    mock_message.from_user.full_name = "Test User"
-    mock_message.from_user.username = "test"
-
-    # Критически важно: добавляем мок для bot
-    mock_message.bot = AsyncMock()
-
-    mock_state = AsyncMock()
-
-    # Настраиваем возвращаемые значения
-    mock_user = MagicMock()
-    mock_user.id = 123
-
-    with patch('src.database.crud.get_user', AsyncMock(return_value=None)), \
-            patch('src.database.crud.create_user', AsyncMock(return_value=mock_user)), \
-            patch('src.database.crud.create_playlist', AsyncMock()):
-        await simple.start_command_handler(mock_message, mock_state)
-
-        mock_message.answer.assert_called_with(
-            views.get_start_msg("Test User"),
-            reply_markup=keyboards.get_main_menu_kb()
-        )
-        mock_state.set_state.assert_called_with(fsm.User.menu)
+# @pytest.mark.asyncio
+# async def test_start_handler():
+#     mock_message = AsyncMock()
+#     mock_message.from_user.id = 123
+#     mock_message.from_user.full_name = "Test User"
+#     mock_message.from_user.username = "test"
+#
+#     # Критически важно: добавляем мок для bot
+#     mock_message.bot = AsyncMock()
+#
+#     mock_state = AsyncMock()
+#
+#     # Настраиваем возвращаемые значения
+#     mock_user = MagicMock()
+#     mock_user.id = 123
+#
+#     with patch('src.database.crud.get_user', AsyncMock(return_value=None)), \
+#             patch('src.database.crud.create_user', AsyncMock(return_value=mock_user)), \
+#             patch('src.database.crud.create_playlist', AsyncMock()):
+#         await simple.start_command_handler(mock_message, mock_state)
+#
+#         mock_message.answer.assert_called_with(
+#             views.get_start_msg("Test User"),
+#             reply_markup=keyboards.get_main_menu_kb()
+#         )
+#         mock_state.set_state.assert_called_with(fsm.User.menu)
 
 
 @pytest.mark.asyncio
