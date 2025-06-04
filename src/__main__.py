@@ -21,6 +21,7 @@ from src.bot.logic.handlers.events import bot_start, bot_stop, stop_command_hand
 
 async def start(async_engine):
     async with async_engine.begin() as conn:
+
         await conn.run_sync(Base.metadata.create_all)
 
     dp = Dispatcher()

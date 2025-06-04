@@ -1,3 +1,5 @@
+import os
+
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Table, UniqueConstraint
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import declarative_base, relationship
@@ -52,6 +54,9 @@ class Audio(Base):
     playlists = relationship("Playlist", secondary=playlists_audios, lazy="selectin", back_populates="audios")
 
 
-DATABASE_URL = f'postgresql+asyncpg://{Secrets.db_user}:{Secrets.db_password}@{Secrets.db_host}:{Secrets.db_port}/{Secrets.db_name}'
+db_host = os.getenv("DB_HOST") or "localhost"
+db_port = os.getenv("DB_PORT") or "5432"
+DATABASE_URL = f'postgresql+asyncpg://{Secrets.db_user}:{Secrets.db_password}@{db_host}:{db_port}/{Secrets.db_name}'
+
 engine = create_async_engine(DATABASE_URL)
 async_session_local = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
