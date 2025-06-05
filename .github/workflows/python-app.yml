@@ -53,3 +53,20 @@ jobs:
         CLEARML_API_SECRET_KEY: ${{ secrets.CLEARML_API_SECRET_KEY }}
       run: |
         pytest
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run command on remote server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{secrets.SSH_HOST}}
+          username: ${{secrets.SSH_USER}}
+          password: ${{secrets.SSH_PASSWORD}}
+          script: |
+            cd ${{secrets.PROJECT_FOLDER}}
+            git checkout main
+            git pull
+            docker-compose down
+            docker-compose up -d --build

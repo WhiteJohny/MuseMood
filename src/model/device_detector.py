@@ -1,5 +1,5 @@
-from torch import accelerator
+from torch import accelerator, device
 
-DEVICE = accelerator.current_accelerator().type if accelerator.is_available() else "cpu"
+DEVICE = accelerator.current_accelerator().type if accelerator.is_available() else device("cpu")
 
 print(f"Using {DEVICE} device")
