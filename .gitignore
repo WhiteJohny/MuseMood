@@ -3,6 +3,7 @@
 /dataset/data/edited/
 /dataset/data/preprocessed/
 /model/*.pth
+/temp/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
