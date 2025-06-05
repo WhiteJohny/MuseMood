@@ -1,4 +1,5 @@
 import asyncio
+import os.path
 
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
@@ -59,17 +60,22 @@ async def audio_analysis_handler(message: Message, state: FSMContext):
 
 async def audio_analysis_link_handler(message: Message):
     logger.info(set_log('Track analysis process link', message.message_id, message.from_user.username))
-    if message.text.startswith('https://www.youtube.com/'):
-        audio_path, duration = await asyncio.to_thread(
-            download_yt_audio,
-            message.text
-        )
-        if audio_path and duration > 0:
+    audio_path, duration = await asyncio.to_thread(
+        download_yt_audio,
+        message.text
+    )
+    if audio_path:
+        try:
             audio_sentiments = await asyncio.to_thread(
                 get_audio_sentiments,
                 audio_path,
                 duration
             )
+
+            title = os.path.basename(audio_path)
+            if os.path.exists(audio_path):
+                os.remove(audio_path)
+
             if audio_sentiments:
                 model_res = await asyncio.to_thread(
                     evaluate_mood,
@@ -77,20 +83,19 @@ async def audio_analysis_link_handler(message: Message):
                     audio_sentiments
                 )
                 if '1' in model_res:
-                    try:
-                        async with async_session_local() as session:
-                            audio = await create_audio(
-                                session,
-                                audio_path[13:],
-                                message.message_id,
-                                model_res,
-                                link=message.text
-                            )
-                            playlist_id = await get_user_playlist(session, message.from_user.id)
-                            await add_audio_to_playlist(session, playlist_id, audio.id)
-                        return await message.reply(get_model_msg(audio), reply_markup=get_analysis_kb())
-                    except Exception as e:
-                        logger.info(set_log('Track analysis process link', special=f"ERROR {e}"))
+                    async with async_session_local() as session:
+                        audio = await create_audio(
+                            session,
+                            title,
+                            message.message_id,
+                            model_res,
+                            link=message.text
+                        )
+                        playlist_id = await get_user_playlist(session, message.from_user.id)
+                        await add_audio_to_playlist(session, playlist_id, audio.id)
+                    return await message.reply(get_model_msg(audio), reply_markup=get_analysis_kb())
+        except Exception as e:
+            logger.info(set_log('Track analysis process link', special=f"ERROR {e}"))
     return await message.answer(get_model_error(), reply_markup=get_analysis_kb())
 
 
@@ -98,24 +103,29 @@ async def audio_analysis_file_handler(message: Message):
     logger.info(set_log('Track analysis process file', message.message_id, message.from_user.username))
     audio_path = await download_tg_audio(message)
     if audio_path:
-        audio_sentiments = await asyncio.to_thread(
-            get_audio_sentiments,
-            audio_path,
-            message.audio.duration
-        )
-        if audio_sentiments:
-            model_res = await asyncio.to_thread(
-                evaluate_mood,
-                model,
-                audio_sentiments
+        try:
+            audio_sentiments = await asyncio.to_thread(
+                get_audio_sentiments,
+                audio_path,
+                message.audio.duration
             )
 
-            if '1' in model_res:
-                try:
+            title = os.path.basename(audio_path)
+            if os.path.exists(audio_path):
+                os.remove(audio_path)
+
+            if audio_sentiments:
+                model_res = await asyncio.to_thread(
+                    evaluate_mood,
+                    model,
+                    audio_sentiments
+                )
+
+                if '1' in model_res:
                     async with async_session_local() as session:
                         audio = await create_audio(
                             session,
-                            audio_path[13:],
+                            title,
                             message.message_id,
                             model_res,
                             file_id=message.audio.file_id
@@ -123,8 +133,8 @@ async def audio_analysis_file_handler(message: Message):
                         playlist_id = await get_user_playlist(session, message.from_user.id)
                         await add_audio_to_playlist(session, playlist_id, audio.id)
                     return await message.reply(get_model_msg(audio), reply_markup=get_analysis_kb())
-                except Exception as e:
-                    logger.info(set_log('Track analysis process file', special=f"ERROR {e}"))
+        except Exception as e:
+            logger.info(set_log('Track analysis process file', special=f"ERROR {e}"))
     return await message.answer(get_model_error(), reply_markup=get_analysis_kb())
 
 

@@ -6,7 +6,7 @@ import os
 from src.bot.logic.settings import bot, logger, set_log
 from src.bot.logic.utils.audio_converters import convert_to_wav
 
-OUTPUT_DIR = "../downloads"
+OUTPUT_DIR = "temp"
 MAX_SIZE = 10 * 1024 * 1024  # 10 МБ
 
 
@@ -63,7 +63,7 @@ def download_yt_audio(url: str, output_dir: str = OUTPUT_DIR):
             info = ydl.extract_info(url, download=True)
 
             base_name = os.path.splitext(ydl.prepare_filename(info))[0]
-            filename = f"{base_name}.wav"
+            filename = f"{output_dir}/{base_name}.wav"
 
             if not os.path.exists(filename):
                 raise FileNotFoundError(f"Audiofile not found: {filename}")
