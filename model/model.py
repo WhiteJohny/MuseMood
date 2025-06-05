@@ -6,12 +6,16 @@ class NeuralNetwork(nn.Module):
         super().__init__()
         self.layer_stack = nn.Sequential(
             nn.Linear(75, 1024),
-            nn.Sigmoid(),
+            nn.ReLU(),
             nn.Linear(1024, 2048),
-            nn.Sigmoid(),
-            nn.Linear(2048, 512),
-            nn.Sigmoid(),
-            nn.Linear(512, 6),
+            nn.ReLU(),
+            nn.Linear(2048, 4096),
+            nn.ReLU(),
+            nn.Linear(4096, 4096),
+            nn.ReLU(),
+            nn.Linear(4096, 2048),
+            nn.ReLU(),
+            nn.Linear(2048, 6),
             nn.Sigmoid()
         )
 

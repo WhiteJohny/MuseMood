@@ -18,7 +18,7 @@ def load_model(model_name: str) -> NeuralNetwork:
     model_weights = model_query[0].get_local_copy(raise_on_error=True, extract_archive=True)
 
     model = NeuralNetwork().to(DEVICE)
-    model.load_state_dict(torch.load(model_weights, weights_only=True))
+    model.load_state_dict(torch.load(model_weights, weights_only=True, map_location=DEVICE))
     model.eval()
     return model
 
