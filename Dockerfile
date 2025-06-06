@@ -15,6 +15,6 @@ RUN pip install --upgrade pip && \
 COPY .env .
 COPY ./src ./src
 
-ENV PYTHONPATH "${PYTHONPATH}:/app"
+ENV PYTHONPATH=/app
 
 CMD [ "python", "./src/__main__.py" ]
